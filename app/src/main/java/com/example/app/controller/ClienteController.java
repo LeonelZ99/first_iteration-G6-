@@ -41,7 +41,7 @@ public class ClienteController {
             db.setDireccion(cliente.getDireccion());
             db.setDni(cliente.getDni());
             db.setCuil(cliente.getCuil());
-            db.setRol(cliente.getRol());
+            // db.setRol(cliente.getRol());
             return ResponseEntity.ok(repo.save(db));
         }).orElse(ResponseEntity.notFound().build());
     }

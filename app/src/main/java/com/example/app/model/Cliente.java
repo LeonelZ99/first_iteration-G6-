@@ -1,75 +1,62 @@
 package com.example.app.model;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.List;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 @Table(name = "clientes")
 public class Cliente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false, unique = true)
     private Long id;
 
-    @Column(nullable = false, length = 100)
+    @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
 
-    @Column(length = 200)
+    @Column(name = "apellido", nullable = false, length = 100)
+    private String apellido;
+
+    @Column(name = "direccion", length = 200)
     private String direccion;
 
-    @Column(unique = true, length = 10)
+    @Column(name = "fecha_nacimiento")
+    private LocalDate fechaNacimiento;
+
+    @Column(name = "ingresos", scale = 2)
+    private BigDecimal ingresos;
+
+    @Column(name = "estado_civil", length = 45)
+    private String estadoCivil;
+    
+    @Column(name = "telefono", length = 20)
+    private String telefono;
+
+    @Column(name = "mail", length = 80)
+    private String mail;
+
+    @Column(name = "dni", unique = true, length = 8)
     private String dni;
 
-    @Column(unique = true, length = 15)
+    @Column(name = "cuil", unique = true, length = 13)
     private String cuil;
 
-    @Column(length = 50)
-    private String rol;
+    @OneToOne(mappedBy = "cliente", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Propietario propietario;
 
-    // Getters y setters
-    public Long getId() {
-        return id;
-    }
+    @OneToMany(mappedBy = "inquilino", fetch = FetchType.LAZY)
+    private List<Contrato> contratos;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getDireccion() {
-        return direccion;
-    }
-
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
-    }
-
-    public String getDni() {
-        return dni;
-    }
-
-    public void setDni(String dni) {
-        this.dni = dni;
-    }
-
-    public String getCuil() {
-        return cuil;
-    }
-
-    public void setCuil(String cuil) {
-        this.cuil = cuil;
-    }
-
-    public String getRol() {
-        return rol;
-    }
-
-    public void setRol(String rol) {
-        this.rol = rol;
-    }
+    @OneToMany(mappedBy = "propietario", fetch = FetchType.LAZY)
+    private List<Propiedad> propiedades;
 }
