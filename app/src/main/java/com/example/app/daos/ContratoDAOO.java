@@ -18,16 +18,16 @@ public class ContratoDAOO implements IContratoDAO {
   public void save(Contrato contrato) {
     String sql = """
       INSERT INTO contratos 
-      (id, fecha_inicio, fecha_fin, clausulas, estado, monto_mensual, deposito_inicial, id_inquilino, id_propiedad) 
+      (fecha_inicio, fecha_fin, clausulas, estado, monto_mensual, deposito_inicial, id_inquilino, id_propiedad) 
       VALUES 
-      (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (?, ?, ?, ?, ?, ?, ?, ?)
     """;
     
     try (
       Connection conn = DBConnection.getInstance().getConnection();
       PreparedStatement stmt = conn.prepareStatement(sql)
     ) {
-      stmt.setLong(1, 1);
+      // stmt.setLong(1, 1);
       stmt.setDate(2, java.sql.Date.valueOf(contrato.getFechaInicio()));
       stmt.setDate(3, java.sql.Date.valueOf(contrato.getFechaFin())); 
       stmt.setString(4, contrato.getClausulas());

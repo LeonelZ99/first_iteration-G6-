@@ -1,33 +1,41 @@
 package com.example.app.controller;
 
-// import com.example.app.model.Cliente;
+import com.example.app.format.ApiResponse;
+import com.example.app.model.Cliente;
 // import com.example.app.repository.ClienteRepository;
-// import org.springframework.http.ResponseEntity;
-// import org.springframework.web.bind.annotation.*;
 
-// import java.util.List;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-// @RestController
-// @RequestMapping("/api/clientes")
+import com.example.app.service.ClienteService;
+
+
+@RestController
+@RequestMapping("/api/clientes")
 public class ClienteController {
 
-    // private final ClienteRepository repo;
+    private final ClienteService clienteService;
 
-    // public ClienteController(ClienteRepository repo) {
-    //     this.repo = repo;
-    // }
+    public ClienteController(ClienteService clienteService) {
+        this.clienteService = clienteService;
+    }
 
     // @GetMapping
     // public List<Cliente> all() {
     //     return repo.findAll();
     // }
 
-    // @GetMapping("/{id}")
-    // public ResponseEntity<Cliente> one(@PathVariable Long id) {
-    //     return repo.findById(id)
-    //             .map(ResponseEntity::ok)
-    //             .orElse(ResponseEntity.notFound().build());
-    // }
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<Cliente>> getClient(@PathVariable Long id) {
+        ApiResponse<Cliente> response = new ApiResponse<>(
+            "success",
+            "success message",
+            this.clienteService.getClienteById(id),
+            null
+        );
+
+        return ResponseEntity.ok(response);
+    }
 
     // @PostMapping
     // public Cliente create(@RequestBody Cliente cliente) {

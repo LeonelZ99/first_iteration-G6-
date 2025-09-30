@@ -5,17 +5,21 @@ import org.springframework.stereotype.Service;
 import com.example.app.daos.ClienteDAO;
 import com.example.app.model.Cliente;
 
-import java.util.Optional;
-
 @Service
 public class ClienteService {
-  private ClienteDAO clienteDao;
+  private final ClienteDAO clienteDao;
 
   public ClienteService(ClienteDAO clienteDao) {
     this.clienteDao = clienteDao;
   }
   
-  public Optional<Cliente> getClienteById(Long idCliente) {
-    return this.clienteDao.getClienteById(idCliente);
+  public Cliente getClienteById(Long idCliente) {
+    Cliente cliente = this.clienteDao.getClienteById(idCliente).orElse(null);
+    
+    if(cliente == null) {
+      throw new RuntimeException("El cliente no existe");
+    }
+
+    return cliente;
   }
 }

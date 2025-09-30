@@ -12,9 +12,9 @@ import java.lang.RuntimeException;
 
 @Service 
 public class ContratoService {
-  private ContratoDAOO contratoDao;
-  private ClienteService clienteService;
-  private PropiedadService propiedadService;
+  private final ContratoDAOO contratoDao;
+  private final ClienteService clienteService;
+  private final PropiedadService propiedadService;
   // private PagoService pagoService;
 
   public ContratoService(ContratoDAOO contratoDao, ClienteService clienteService, PropiedadService propiedadService) {
@@ -25,18 +25,20 @@ public class ContratoService {
   }
 
   public Contrato saveContrato(Contrato contrato, Long idInquilino, Long idPropiedad) {
-    Cliente inquilino = this.clienteService.getClienteById(idInquilino).orElse(null);
+    Cliente inquilino = this.clienteService.getClienteById(idInquilino);
     
-    // si inquilino es null throw error
     if(inquilino == null) {
       throw new RuntimeException("No existe el inquilino");
     }
     
-    Propiedad propiedad = this.propiedadService.getPropiedadById(idPropiedad).orElse(null);
+    Propiedad propiedad = this.propiedadService.getPropiedadById(idPropiedad);
     
-    // si propiedad es null throw error
     if(propiedad == null) {
       throw new RuntimeException("No existe la propiedad");
+    }
+
+    if(propiedad.getPropietario().getCliente().getId().equals(inquilino.getId())) {
+      throw new RuntimeException("El inquilino es propietario de la propiedad seleccionada");
     }
 
     Contrato newContrato = new Contrato();

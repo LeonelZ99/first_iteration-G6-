@@ -32,21 +32,25 @@ public class ClienteDAO implements IClienteDAO {
 
       ResultSet rs = stmt.executeQuery();
 
-      Cliente c = new Cliente();
+      if(rs.next()) {
+        Cliente c = new Cliente();
 
-      c.setId(rs.getLong("id"));
-      c.setNombre(rs.getString("nombre"));
-      c.setApellido(rs.getString("apellido"));
-      c.setDireccion(rs.getString("direccion"));
-      c.setFechaNacimiento(rs.getDate("fecha_nacimiento").toLocalDate());
-      c.setIngresos(rs.getBigDecimal("ingresos"));
-      c.setEstadoCivil(rs.getString("estado_civil"));
-      c.setTelefono(rs.getString("telefono"));
-      c.setMail(rs.getString("mail"));
-      c.setDni(rs.getString("dni"));
-      c.setCuil(rs.getString("cuil"));
+        c.setId(rs.getLong("id"));
+        c.setNombre(rs.getString("nombre"));
+        c.setApellido(rs.getString("apellido"));
+        c.setDireccion(rs.getString("direccion"));
+        c.setFechaNacimiento(rs.getDate("fecha_nacimiento").toLocalDate());
+        c.setIngresos(rs.getBigDecimal("ingresos"));
+        c.setEstadoCivil(rs.getString("estado_civil"));
+        c.setTelefono(rs.getString("telefono"));
+        c.setMail(rs.getString("mail"));
+        c.setDni(rs.getString("dni"));
+        c.setCuil(rs.getString("cuil"));
 
-      return Optional.of(c);
+        return Optional.of(c);
+      } else {
+        return Optional.empty();
+      }
     } catch (SQLException e) {
       System.out.println(e);
       return Optional.empty();
