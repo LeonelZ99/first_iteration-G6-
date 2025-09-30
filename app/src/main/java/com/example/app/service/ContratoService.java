@@ -38,20 +38,12 @@ public class ContratoService {
     if(propiedad.getPropietario().getCliente().getId().equals(inquilino.getId())) {
       throw new RuntimeException("El inquilino es propietario de la propiedad seleccionada");
     }
+    
+    contrato.setInquilino(inquilino);
+    contrato.setPropiedad(propiedad);
 
-    Contrato newContrato = new Contrato();
+    contratoDao.save(contrato);
 
-    newContrato.setFechaInicio(contrato.getFechaInicio());
-    newContrato.setFechaFin(contrato.getFechaFin());
-    newContrato.setClausulas(contrato.getClausulas());
-    newContrato.setEstado(contrato.getEstado());
-    newContrato.setMontoMensual(contrato.getMontoMensual());
-    newContrato.setDepositoInicial(contrato.getDepositoInicial());
-    newContrato.setInquilino(inquilino);
-    newContrato.setPropiedad(propiedad);
-
-    contratoDao.save(newContrato);
-
-    return newContrato; 
+    return contrato; 
   }
 }
