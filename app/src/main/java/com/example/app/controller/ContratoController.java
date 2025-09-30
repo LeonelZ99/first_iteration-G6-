@@ -25,8 +25,7 @@ public class ContratoController {
     ApiResponse<String> response = new ApiResponse<>(
       "success",
       "success message",
-      "Hello world",
-      null
+      "Hello world"
     );
 
     return ResponseEntity.ok(response);
@@ -34,17 +33,14 @@ public class ContratoController {
 
   @PostMapping("/")
   public ResponseEntity<ApiResponse<Contrato>> createContrato(
-    @RequestBody ContratoDto req
+    @RequestBody Contrato contrato,
+    @RequestParam(name = "inquilino") Long idInquilino,
+    @RequestParam(name = "propiedad") Long idPropiedad
   ) {
-    Contrato contrato = req.contrato();
-    Long idInquilino = req.idInquilino();
-    Long idPropiedad = req.idPropiedad();
-
     ApiResponse<Contrato> response = new ApiResponse<>(
       "ok",
       "contrato creado exitosamente",
-      this.contratoService.saveContrato(contrato, idInquilino, idPropiedad),
-      null
+      this.contratoService.saveContrato(contrato, idInquilino, idPropiedad)
     );
 
     return ResponseEntity.ok(response);

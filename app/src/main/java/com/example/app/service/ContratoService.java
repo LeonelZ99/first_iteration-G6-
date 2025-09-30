@@ -15,13 +15,11 @@ public class ContratoService {
   private final ContratoDAOO contratoDao;
   private final ClienteService clienteService;
   private final PropiedadService propiedadService;
-  // private PagoService pagoService;
 
   public ContratoService(ContratoDAOO contratoDao, ClienteService clienteService, PropiedadService propiedadService) {
     this.contratoDao = contratoDao;
     this.clienteService = clienteService;
     this.propiedadService = propiedadService;
-    // this.pagoService = pagoService;
   }
 
   public Contrato saveContrato(Contrato contrato, Long idInquilino, Long idPropiedad) {
