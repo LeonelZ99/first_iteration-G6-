@@ -1,11 +1,6 @@
 package com.example.app.daos;
 
-import java.sql.PreparedStatement;
-
-import com.example.app.db.DBConnection;
 import com.example.app.model.Contrato;
-import java.sql.Connection;
-import java.sql.SQLException;
 
 import org.springframework.stereotype.Component;
 
@@ -20,25 +15,21 @@ public class ContratoDAOO implements IContratoDAO {
       INSERT INTO contratos 
       (fecha_inicio, fecha_fin, clausulas, estado, monto_mensual, deposito_inicial, id_inquilino, id_propiedad) 
       VALUES 
-      (?, ?, ?, ?, ?, ?, ?, ?)
+      (:fechaInicio, :fechaFin, :clausulas, :estado, :montoMensual, :depositoInicial, :idInquilino, :idPropiedad)
     """;
-    
-    try (
-      Connection conn = DBConnection.getInstance().getConnection();
-      PreparedStatement stmt = conn.prepareStatement(sql)
-    ) {
-      // stmt.setLong(1, 1);
-      stmt.setDate(2, java.sql.Date.valueOf(contrato.getFechaInicio()));
-      stmt.setDate(3, java.sql.Date.valueOf(contrato.getFechaFin())); 
-      stmt.setString(4, contrato.getClausulas());
-      stmt.setString(5, contrato.getEstado());
-      stmt.setBigDecimal(6, contrato.getMontoMensual());
-      stmt.setBigDecimal(7, contrato.getDepositoInicial());
-      stmt.setLong(8, contrato.getInquilino().getId());
-      stmt.setLong(9, contrato.getPropiedad().getId());
 
-      stmt.executeUpdate();
-    } catch (SQLException e) {
+    try {
+      Sql2oDAO.getSql2o().createQuery(sql)
+        .addParameter("fechaInicio", contrato.getFechaInicio())
+        .addParameter("fechaFin", contrato.getFechaFin())
+        .addParameter("clausulas", contrato.getClausulas())
+        .addParameter("estado", contrato.getEstado())
+        .addParameter("montoMensual", contrato.getMontoMensual())
+        .addParameter("depositoInicial", contrato.getDepositoInicial())
+        .addParameter("idInquilino", contrato.getInquilino().getId())
+        .addParameter("idPropiedad", contrato.getPropiedad().getId())
+        .executeUpdate();
+    } catch (org.sql2o.Sql2oException e) {
       e.printStackTrace();
     }
   }

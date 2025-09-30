@@ -1,17 +1,14 @@
 package com.example.app.daos;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.time.ZoneId;
 import java.util.Optional;
 
-import com.example.app.db.DBConnection;
 import com.example.app.model.Cliente;
 import com.example.app.model.Propiedad;
 import com.example.app.model.Propietario;
 
 import org.springframework.stereotype.Component;
+import org.sql2o.data.Row;
 
 import lombok.RequiredArgsConstructor;
 
@@ -46,52 +43,54 @@ public class PropiedadDAO implements IPropiedadDAO {
       FROM propiedades pr
       LEFT JOIN propietarios p ON p.id_propietario = pr.id_propietario
       LEFT JOIN clientes     c ON c.id            = pr.id_propietario
-      WHERE pr.id = ?
+      WHERE pr.id = :idPropiedad
     """;
     
-    try (
-      Connection conn = DBConnection.getInstance().getConnection();
-      PreparedStatement stmt = conn.prepareStatement(sql)
-    ) {
+    try {
+      Row sqlResponse = Sql2oDAO.getSql2o().createQuery(sql)
+        .addParameter("idPropiedad", idPropiedad)
+        .executeAndFetchTable()
+        .rows()
+        .stream()
+        .findFirst()
+        .get();
 
-      stmt.setLong(1, idPropiedad);
-
-      ResultSet rs = stmt.executeQuery();
-      if(rs.next()) {
+      if(sqlResponse.getLong("prop_id") == null) {
+        return Optional.empty();
+      } else {
+        
         Propiedad propiedad = new Propiedad();
-        propiedad.setId(rs.getLong("prop_id"));
-        propiedad.setDireccion(rs.getString("prop_direccion"));
-        propiedad.setPrecio(rs.getBigDecimal("prop_precio"));
-        propiedad.setMoneda(rs.getString("prop_moneda"));
-        propiedad.setTipoPropiedad(rs.getString("prop_tipo"));
+        propiedad.setId(sqlResponse.getLong("prop_id"));
+        propiedad.setDireccion(sqlResponse.getString("prop_direccion"));
+        propiedad.setPrecio(sqlResponse.getBigDecimal("prop_precio"));
+        propiedad.setMoneda(sqlResponse.getString("prop_moneda"));
+        propiedad.setTipoPropiedad(sqlResponse.getString("prop_tipo"));
 
         Cliente c = new Cliente();
 
-        c.setId(rs.getLong("cli_id"));
-        c.setNombre(rs.getString("cli_nombre"));
-        c.setApellido(rs.getString("cli_apellido"));
-        c.setDireccion(rs.getString("cli_direccion"));
-        c.setFechaNacimiento(rs.getDate("cli_fecha_nac").toLocalDate());
-        c.setIngresos(rs.getBigDecimal("cli_ingresos"));
-        c.setEstadoCivil(rs.getString("cli_estado_civil"));
-        c.setTelefono(rs.getString("cli_telefono"));
-        c.setMail(rs.getString("cli_mail"));
-        c.setDni(rs.getString("cli_dni"));
-        c.setCuil(rs.getString("cli_cuil"));
+        c.setId(sqlResponse.getLong("cli_id"));
+        c.setNombre(sqlResponse.getString("cli_nombre"));
+        c.setApellido(sqlResponse.getString("cli_apellido"));
+        c.setDireccion(sqlResponse.getString("cli_direccion"));
+        c.setFechaNacimiento(((java.sql.Date) sqlResponse.getDate("cli_fecha_nac")).toLocalDate());
+        c.setIngresos(sqlResponse.getBigDecimal("cli_ingresos"));
+        c.setEstadoCivil(sqlResponse.getString("cli_estado_civil"));
+        c.setTelefono(sqlResponse.getString("cli_telefono"));
+        c.setMail(sqlResponse.getString("cli_mail"));
+        c.setDni(sqlResponse.getString("cli_dni"));
+        c.setCuil(sqlResponse.getString("cli_cuil"));
 
         Propietario propietario = new Propietario();
         propietario.setCliente(c);
-        propietario.setCbu(rs.getString("prop_cbu"));
+        propietario.setCbu(sqlResponse.getString("prop_cbu"));
 
         propiedad.setPropietario(propietario);
 
-        System.out.println(propiedad);
 
         return Optional.of(propiedad);
-      } else {
-        return Optional.empty();
+
       }
-    } catch (SQLException e) {
+    } catch (org.sql2o.Sql2oException e) {
       System.out.println(e);
       return Optional.empty();
     }

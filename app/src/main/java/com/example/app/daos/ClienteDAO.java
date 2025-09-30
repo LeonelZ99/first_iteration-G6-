@@ -1,14 +1,12 @@
 package com.example.app.daos;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
+import org.sql2o.data.Row;
 
-import com.example.app.db.DBConnection;
 import com.example.app.model.Cliente;
 import lombok.RequiredArgsConstructor;
 
@@ -21,37 +19,38 @@ public class ClienteDAO implements IClienteDAO {
       SELECT id, nombre, apellido, direccion, fecha_nacimiento, ingresos,
              estado_civil, telefono, mail, dni, cuil
       FROM clientes
-      WHERE id = ?
+      WHERE id = :idCliente
     """;
 
-    try (
-      Connection conn = DBConnection.getInstance().getConnection();
-      PreparedStatement stmt = conn.prepareStatement(sql)
-    ) {
-      stmt.setLong(1, idCliente);
+    try {
+      Row row = Sql2oDAO.getSql2o()
+        .open()
+        .createQuery(sql)
+        .addParameter("idCliente", idCliente)
+        .executeAndFetchTable()
+        .rows()
+        .stream()
+        .findFirst()
+        .orElse(null);
 
-      ResultSet rs = stmt.executeQuery();
+      if (row == null) return Optional.empty();
 
-      if(rs.next()) {
-        Cliente c = new Cliente();
+      Cliente c = new Cliente();
+      c.setId(row.getLong("id"));
+      c.setNombre(row.getString("nombre"));
+      c.setApellido(row.getString("apellido"));
+      c.setDireccion(row.getString("direccion"));
+      c.setFechaNacimiento(((java.sql.Date) row.getDate("fecha_nacimiento")).toLocalDate());
+      c.setIngresos(row.getBigDecimal("ingresos"));
+      c.setEstadoCivil(row.getString("estado_civil"));
+      c.setTelefono(row.getString("telefono"));
+      c.setMail(row.getString("mail"));
+      c.setDni(row.getString("dni"));
+      c.setCuil(row.getString("cuil"));
 
-        c.setId(rs.getLong("id"));
-        c.setNombre(rs.getString("nombre"));
-        c.setApellido(rs.getString("apellido"));
-        c.setDireccion(rs.getString("direccion"));
-        c.setFechaNacimiento(rs.getDate("fecha_nacimiento").toLocalDate());
-        c.setIngresos(rs.getBigDecimal("ingresos"));
-        c.setEstadoCivil(rs.getString("estado_civil"));
-        c.setTelefono(rs.getString("telefono"));
-        c.setMail(rs.getString("mail"));
-        c.setDni(rs.getString("dni"));
-        c.setCuil(rs.getString("cuil"));
+      return Optional.of(c);
 
-        return Optional.of(c);
-      } else {
-        return Optional.empty();
-      }
-    } catch (SQLException e) {
+    } catch (org.sql2o.Sql2oException e) {
       System.out.println(e);
       return Optional.empty();
     }
