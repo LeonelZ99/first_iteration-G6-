@@ -1,23 +1,23 @@
 package com.example.app.model;
 
-import jakarta.persistence.*;
+// import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
+// @Entity
 @Setter
 @Getter
 @NoArgsConstructor
-@Table(name = "propietarios")
+// @Table(name = "propietarios")
 public class Propietario {
-  @Id
-  @Column(name = "id_propietario")
+  // @Id
+  // @Column(name = "id_propietario")
   private Long id;
 
-  @Column(name = "cbu", nullable = false, length = 22)
+  // @Column(name = "cbu", nullable = false, length = 22)
   private String cbu;
 
-  @OneToOne(fetch = FetchType.EAGER, optional = false)
-  @MapsId
-  @JoinColumn(name = "id_propietario", foreignKey = @ForeignKey(name = "fk_propietario_cliente"))
+  // @OneToOne(fetch = FetchType.EAGER, optional = false)
+  // @MapsId
+  // @JoinColumn(name = "id_propietario", foreignKey = @ForeignKey(name = "fk_propietario_cliente"))
   private Cliente cliente;
 }
