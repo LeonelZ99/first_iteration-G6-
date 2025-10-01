@@ -1,8 +1,12 @@
 package com.example.app.daos;
 
 import com.example.app.model.Contrato;
+import com.example.app.model.Propiedad;
+
+import java.util.Optional;
 
 import org.springframework.stereotype.Component;
+import org.sql2o.data.Row;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +35,55 @@ public class ContratoDAOO implements IContratoDAO {
         .executeUpdate();
     } catch (org.sql2o.Sql2oException e) {
       throw new RuntimeException(e.getMessage());
+    }
+  }
+
+  @Override
+  public Optional<Contrato> getContratoById(Long idContrato) {
+    String sql = """
+      SELECT
+        id,
+        fecha_inicio,
+        fecha_fin,
+        clausulas,
+        estado,
+        monto_mensual,
+        deposito_inicial,
+        id_inquilino,
+        id_propiedad
+      FROM contrato
+      WHERE id = :idContrato
+    """;
+    
+    try {
+      Row sqlResponse = Sql2oDAO.getSql2o().createQuery(sql)
+        .addParameter("idContrato", idContrato)
+        .executeAndFetchTable()
+        .rows()
+        .stream()
+        .findFirst()
+        .get();
+
+      if(sqlResponse.getLong("id") == null) {
+        return Optional.empty();
+      } else {
+        
+        Contrato contrato = new Contrato();
+        contrato.setId(sqlResponse.getLong("id"));
+        contrato.setFechaInicio(((java.sql.Date) sqlResponse.getDate("fecha_inicio")).toLocalDate());
+        contrato.setFechaFin(((java.sql.Date) sqlResponse.getDate("fecha_fin")).toLocalDate());
+        contrato.setClausulas(sqlResponse.getString("clausulas"));
+        contrato.setEstado(sqlResponse.getString("estado"));
+        contrato.setMontoMensual(sqlResponse.getBigDecimal("monto_mensual"));
+        contrato.setDepositoInicial(sqlResponse.getBigDecimal("deposito_inicial"));
+        contrato.setIdInquilino(sqlResponse.getLong("id_inquilino"));
+        contrato.setIdPropiedad(sqlResponse.getLong("id_propiedad"));
+
+        return Optional.of(contrato);
+      }
+    } catch (org.sql2o.Sql2oException e) {
+      System.out.println(e);
+      return Optional.empty();
     }
   }
 }

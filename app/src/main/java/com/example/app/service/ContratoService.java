@@ -22,18 +22,19 @@ public class ContratoService {
     this.propiedadService = propiedadService;
   }
 
+  public Contrato getContratoById(Long idContrato) {
+    Contrato contrato = this.contratoDao.getContratoById(idContrato).orElse(null);
+
+    if(contrato == null) {
+      throw new RuntimeException("La propiedad no existe");
+    }
+
+    return contrato;
+  }
+
   public Contrato saveContrato(Contrato contrato, Long idInquilino, Long idPropiedad) {
     Cliente inquilino = this.clienteService.getClienteById(idInquilino);
-    
-    if(inquilino == null) {
-      throw new RuntimeException("No existe el inquilino");
-    }
-    
     Propiedad propiedad = this.propiedadService.getPropiedadById(idPropiedad);
-    
-    if(propiedad == null) {
-      throw new RuntimeException("No existe la propiedad");
-    }
 
     if(propiedad.getIdPropietario().equals(inquilino.getId())) {
       throw new RuntimeException("El inquilino es propietario de la propiedad seleccionada");
