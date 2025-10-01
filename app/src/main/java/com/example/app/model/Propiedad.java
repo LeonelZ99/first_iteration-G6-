@@ -14,5 +14,5 @@ public class Propiedad {
   private BigDecimal precio;
   private String moneda;
   private String tipoPropiedad;
-  private Propietario propietario;
+  private Long idPropietario;
 }

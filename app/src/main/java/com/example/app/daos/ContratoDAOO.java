@@ -26,11 +26,11 @@ public class ContratoDAOO implements IContratoDAO {
         .addParameter("estado", contrato.getEstado())
         .addParameter("montoMensual", contrato.getMontoMensual())
         .addParameter("depositoInicial", contrato.getDepositoInicial())
-        .addParameter("idInquilino", contrato.getInquilino().getId())
-        .addParameter("idPropiedad", contrato.getPropiedad().getId())
+        .addParameter("idInquilino", contrato.getIdInquilino())
+        .addParameter("idPropiedad", contrato.getIdPropiedad())
         .executeUpdate();
     } catch (org.sql2o.Sql2oException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e.getMessage());
     }
   }
 }

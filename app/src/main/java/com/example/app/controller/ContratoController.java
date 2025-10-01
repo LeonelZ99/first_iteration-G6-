@@ -46,8 +46,6 @@ public class ContratoController {
     contrato.setEstado(req.estado());
     contrato.setMontoMensual(req.montoMensual());
     contrato.setMontoMensual(req.depositoInicial());
-    contrato.setInquilino(req.inquilino());
-    contrato.setPropiedad(req.propiedad());
 
     ApiResponse<Contrato> response = new ApiResponse<>(
       "ok",

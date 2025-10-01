@@ -19,7 +19,7 @@ public class Contrato {
   private String estado;
   private BigDecimal montoMensual;
   private BigDecimal depositoInicial;
-  private Cliente inquilino;
-  private Propiedad propiedad;
+  private Long idInquilino;
+  private Long idPropiedad;
   // private List<Pago> pagos;
 }

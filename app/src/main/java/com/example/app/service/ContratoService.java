@@ -35,15 +35,19 @@ public class ContratoService {
       throw new RuntimeException("No existe la propiedad");
     }
 
-    if(propiedad.getPropietario().getCliente().getId().equals(inquilino.getId())) {
+    if(propiedad.getIdPropietario().equals(inquilino.getId())) {
       throw new RuntimeException("El inquilino es propietario de la propiedad seleccionada");
     }
+
+    contrato.setIdInquilino(idInquilino);
+    contrato.setIdPropiedad(idPropiedad);
     
-    contrato.setInquilino(inquilino);
-    contrato.setPropiedad(propiedad);
+    try {
+      contratoDao.save(contrato);
 
-    contratoDao.save(contrato);
-
-    return contrato; 
+      return contrato; 
+    } catch (RuntimeException e) {
+      throw new RuntimeException(e.getMessage());
+    }
   }
 }
