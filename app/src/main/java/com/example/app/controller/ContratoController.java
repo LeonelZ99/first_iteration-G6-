@@ -45,7 +45,7 @@ public class ContratoController {
     contrato.setClausulas(req.clausulas());
     contrato.setEstado(req.estado());
     contrato.setMontoMensual(req.montoMensual());
-    contrato.setMontoMensual(req.depositoInicial());
+    contrato.setDepositoInicial(req.depositoInicial());
 
     ApiResponse<Contrato> response = new ApiResponse<>(
       "ok",

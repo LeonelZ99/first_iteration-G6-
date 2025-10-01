@@ -1,7 +1,6 @@
 package com.example.app.daos;
 
 import com.example.app.model.Contrato;
-import com.example.app.model.Propiedad;
 
 import java.util.Optional;
 
@@ -34,6 +33,7 @@ public class ContratoDAOO implements IContratoDAO {
         .addParameter("idPropiedad", contrato.getIdPropiedad())
         .executeUpdate();
     } catch (org.sql2o.Sql2oException e) {
+      System.out.println("No pude guardar");
       throw new RuntimeException(e.getMessage());
     }
   }

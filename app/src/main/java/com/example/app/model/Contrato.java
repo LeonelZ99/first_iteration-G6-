@@ -21,5 +21,4 @@ public class Contrato {
   private BigDecimal depositoInicial;
   private Long idInquilino;
   private Long idPropiedad;
-  // private List<Pago> pagos;
 }

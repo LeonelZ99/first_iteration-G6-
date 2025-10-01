@@ -19,13 +19,12 @@ public class PropiedadDAO implements IPropiedadDAO {
   public Optional<Propiedad> getPropiedadById(Long idPropiedad) {
     String sql = """
       SELECT
-        id            
-        direccion     
-        precio        
-        moneda        
-        tipo_propiedad
+        id,
+        direccion,
+        precio,
+        moneda,
+        tipo_propiedad,
         id_propietario
-
       FROM propiedades
       WHERE id = :idPropiedad
     """;
@@ -47,8 +46,8 @@ public class PropiedadDAO implements IPropiedadDAO {
         propiedad.setId(sqlResponse.getLong("id"));
         propiedad.setDireccion(sqlResponse.getString("direccion"));
         propiedad.setPrecio(sqlResponse.getBigDecimal("precio"));
-        propiedad.setMoneda(sqlResponse.getString("tipo"));
         propiedad.setMoneda(sqlResponse.getString("moneda"));
+        propiedad.setTipoPropiedad(sqlResponse.getString("tipo_propiedad"));
         propiedad.setIdPropietario(sqlResponse.getLong("id_propietario"));
 
         return Optional.of(propiedad);
