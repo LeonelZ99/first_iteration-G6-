@@ -6,7 +6,6 @@ import com.example.app.dto.GenerarPagoRequest;
 import com.example.app.dto.ReciboPagoDto;
 import com.example.app.model.Contrato;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -23,7 +22,6 @@ public class PagoService {
         this.contratoDAO = contratoDAO;
     }
 
-    @Transactional
     public ReciboPagoDto generarPago(GenerarPagoRequest req) {
         if (req == null || req.contratoId() == null || req.periodo() == null) {
             throw new RuntimeException("Datos de pago inválidos");
