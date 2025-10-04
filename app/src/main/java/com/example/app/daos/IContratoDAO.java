@@ -7,4 +7,5 @@ import java.util.Optional;
 public interface IContratoDAO { 
   public void save(Contrato contrato);
   public Optional<Contrato> getContratoById(Long idContrato);
+  public Optional<Contrato> getContratoByIdInquilino(Long idInquilino);
 }

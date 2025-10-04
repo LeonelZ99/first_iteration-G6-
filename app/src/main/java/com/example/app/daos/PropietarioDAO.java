@@ -30,34 +30,35 @@ public class PropietarioDAO {
     """;
 
     try {
-      Row row = Sql2oDAO.getSql2o()
+      Optional<Row> row = Sql2oDAO.getSql2o()
         .open()
         .createQuery(sql)
         .addParameter("idCliente", idCliente)
         .executeAndFetchTable()
         .rows()
         .stream()
-        .findFirst()
-        .orElse(null);
+        .findFirst();
 
-      if (row == null) return Optional.empty();
+      if (row.isEmpty()) return Optional.empty();
+
+      Row sqlResponse = row.get();
 
       Cliente c = new Cliente();
-      c.setId(row.getLong("id"));
-      c.setNombre(row.getString("nombre"));
-      c.setApellido(row.getString("apellido"));
-      c.setDireccion(row.getString("direccion"));
-      c.setFechaNacimiento(((java.sql.Date) row.getDate("fecha_nacimiento")).toLocalDate());
-      c.setIngresos(row.getBigDecimal("ingresos"));
-      c.setEstadoCivil(row.getString("estado_civil"));
-      c.setTelefono(row.getString("telefono"));
-      c.setMail(row.getString("mail"));
-      c.setDni(row.getString("dni"));
-      c.setCuil(row.getString("cuil"));
+      c.setId(sqlResponse.getLong("id"));
+      c.setNombre(sqlResponse.getString("nombre"));
+      c.setApellido(sqlResponse.getString("apellido"));
+      c.setDireccion(sqlResponse.getString("direccion"));
+      c.setFechaNacimiento(((java.sql.Date) sqlResponse.getDate("fecha_nacimiento")).toLocalDate());
+      c.setIngresos(sqlResponse.getBigDecimal("ingresos"));
+      c.setEstadoCivil(sqlResponse.getString("estado_civil"));
+      c.setTelefono(sqlResponse.getString("telefono"));
+      c.setMail(sqlResponse.getString("mail"));
+      c.setDni(sqlResponse.getString("dni"));
+      c.setCuil(sqlResponse.getString("cuil"));
 
       Propietario p = new Propietario();
       p.setCliente(c);
-      p.setCbu(row.getString("cbu"));
+      p.setCbu(sqlResponse.getString("cbu"));
 
       return Optional.of(p);
 

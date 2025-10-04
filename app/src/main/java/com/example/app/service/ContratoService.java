@@ -43,8 +43,6 @@ public class ContratoService {
     contrato.setIdInquilino(idInquilino);
     contrato.setIdPropiedad(idPropiedad);
     
-    System.out.println("ESTOY EN EL SERVICEEEEEEEE");
-
     try {
       contratoDao.save(contrato);
 

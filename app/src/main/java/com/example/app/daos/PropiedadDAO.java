@@ -30,18 +30,18 @@ public class PropiedadDAO implements IPropiedadDAO {
     """;
     
     try {
-      Row sqlResponse = Sql2oDAO.getSql2o().createQuery(sql)
+      Optional<Row> row = Sql2oDAO.getSql2o().createQuery(sql)
         .addParameter("idPropiedad", idPropiedad)
         .executeAndFetchTable()
         .rows()
         .stream()
-        .findFirst()
-        .get();
+        .findFirst();
 
-      if(sqlResponse.getLong("id") == null) {
+      if(row.isEmpty()) {
         return Optional.empty();
       } else {
-        
+        Row sqlResponse = row.get();
+
         Propiedad propiedad = new Propiedad();
         propiedad.setId(sqlResponse.getLong("id"));
         propiedad.setDireccion(sqlResponse.getString("direccion"));

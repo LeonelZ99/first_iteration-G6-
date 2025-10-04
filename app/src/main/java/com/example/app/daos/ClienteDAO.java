@@ -51,7 +51,6 @@ public class ClienteDAO implements IClienteDAO {
       return Optional.of(c);
 
     } catch (org.sql2o.Sql2oException e) {
-      System.out.println(e);
       return Optional.empty();
     }
   }
