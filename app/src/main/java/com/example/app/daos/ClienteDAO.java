@@ -16,24 +16,25 @@ public class ClienteDAO implements IClienteDAO {
   @Override
   public Optional<Cliente> getClienteById(Long idCliente) {
     String sql = """
-      SELECT id, nombre, apellido, direccion, fecha_nacimiento, ingresos,
-             estado_civil, telefono, mail, dni, cuil
-      FROM clientes
-      WHERE id = :idCliente
-    """;
+          SELECT id, nombre, apellido, direccion, fecha_nacimiento, ingresos,
+                 estado_civil, telefono, mail, dni, cuil
+          FROM clientes
+          WHERE id = :idCliente
+        """;
 
     try {
       Row row = Sql2oDAO.getSql2o()
-        .open()
-        .createQuery(sql)
-        .addParameter("idCliente", idCliente)
-        .executeAndFetchTable()
-        .rows()
-        .stream()
-        .findFirst()
-        .orElse(null);
+          .open()
+          .createQuery(sql)
+          .addParameter("idCliente", idCliente)
+          .executeAndFetchTable()
+          .rows()
+          .stream()
+          .findFirst()
+          .orElse(null);
 
-      if (row == null) return Optional.empty();
+      if (row == null)
+        return Optional.empty();
 
       Cliente c = new Cliente();
       c.setId(row.getLong("id"));
