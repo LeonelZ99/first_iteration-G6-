@@ -51,7 +51,7 @@ public class PagoService {
         // 4) Calcular monto
         BigDecimal expensas = req.expensas() != null ? req.expensas() : BigDecimal.ZERO;
         BigDecimal impuestos = req.impuestos() != null ? req.impuestos() : BigDecimal.ZERO;
-        BigDecimal precio = contrato.getPrecioMensual() != null ? contrato.getPrecioMensual() : BigDecimal.ZERO;
+        BigDecimal precio = contrato.getMontoMensual() != null ? contrato.getMontoMensual() : BigDecimal.ZERO;
         BigDecimal monto = precio.add(expensas).add(impuestos);
 
         // 5) Fecha pago
