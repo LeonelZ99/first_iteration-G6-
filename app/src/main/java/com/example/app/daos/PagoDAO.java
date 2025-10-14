@@ -23,7 +23,7 @@ public class PagoDAO implements IPagoDAO {
         String sql = """
                   SELECT 1
                   FROM pagos
-                  WHERE contrato_id = :contratoId
+                  WHERE id_contrato = :contratoId
                     AND periodo = :periodo
                   LIMIT 1
                 """;
@@ -40,7 +40,7 @@ public class PagoDAO implements IPagoDAO {
     public Long insertPago(Long contratoId, String periodo, LocalDate fechaPago, String tipoPago,
             BigDecimal expensas, BigDecimal impuestos, BigDecimal monto) {
         String sql = """
-                  INSERT INTO pagos (contrato_id, periodo, fecha_pago, tipo_pago, expensas, impuestos, monto)
+                  INSERT INTO pagos (id_contrato, periodo, fecha_pago, tipo_pago, expensas, impuestos, monto)
                   VALUES (:contratoId, :periodo, :fechaPago, :tipoPago, :expensas, :impuestos, :monto)
                 """;
         try (Connection con = sql2o.beginTransaction()) {

@@ -50,8 +50,8 @@ public class ContratoDAOO implements IContratoDAO {
         deposito_inicial,
         id_inquilino,
         id_propiedad
-      FROM contrato
-      WHERE id = :idContrato
+      FROM inmobiliaria.contratos
+      WHERE id = :idContrato;
     """;
     
     try {

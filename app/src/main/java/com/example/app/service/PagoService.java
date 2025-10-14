@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 
+import java.time.LocalDateTime;
 @Service
 public class PagoService {
 
@@ -36,17 +37,7 @@ public class PagoService {
         }
 
         // 2) Validar periodo dentro de la vigencia del contrato
-        YearMonth periodo = parsePeriodo(req.periodo());
-        YearMonth inicio = YearMonth.from(contrato.getFechaInicio());
-        YearMonth fin = YearMonth.from(contrato.getFechaFin());
-        if (periodo.isBefore(inicio) || periodo.isAfter(fin)) {
-            throw new RuntimeException("Periodo fuera de la vigencia del contrato");
-        }
-
-        // 3) Chequear duplicado
-        if (pagoDAO.existsPago(req.contratoId(), periodo.toString())) {
-            throw new RuntimeException("El periodo ya está cancelado");
-        }
+        LocalDate periodo = req.periodo();
 
         // 4) Calcular monto
         BigDecimal expensas = req.expensas() != null ? req.expensas() : BigDecimal.ZERO;
