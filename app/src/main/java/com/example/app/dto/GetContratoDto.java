@@ -4,7 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-public record ContratoDto(
+public record GetContratoDto(
+  Long id,
   LocalDate fechaInicio,
   LocalDate fechaFin,
   String clausulas,
@@ -13,6 +14,5 @@ public record ContratoDto(
   BigDecimal depositoInicial,
   Long idInquilino,
   Long idPropiedad,
-  List<GaranteDto> garantes
-) {
-}
+  List<Long> idsGarantes
+) {}

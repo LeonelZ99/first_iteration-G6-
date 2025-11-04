@@ -14,5 +14,5 @@ public class Pago {
   private LocalDate fechaPago;
   private BigDecimal monto;
   private BigDecimal expensas;
-  private Contrato contrato;
+  private Long idContrato;
 }

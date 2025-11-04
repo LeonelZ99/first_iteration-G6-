@@ -17,8 +17,6 @@ public class Cliente {
     private String apellido;
     private String direccion;
     private LocalDate fechaNacimiento;
-    private BigDecimal ingresos;
-    private String estadoCivil;
     private String telefono;
     private String mail;
     private String dni;

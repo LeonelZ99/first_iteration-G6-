@@ -1,6 +1,6 @@
 package com.example.app.daos;
 
-import com.example.app.model.Cliente;
+import com.example.app.model.*;
 import java.util.Optional;
 
 public interface IClienteDAO {

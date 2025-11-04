@@ -1,7 +1,7 @@
 package com.example.app.service;
 
 import com.example.app.daos.IPagoDAO;
-import com.example.app.daos.IContratoDAO;
+import com.example.app.daos.ContratoDAOO;
 import com.example.app.dto.GenerarPagoRequest;
 import com.example.app.dto.ReciboPagoDto;
 import com.example.app.model.Contrato;
@@ -16,9 +16,9 @@ import java.time.LocalDateTime;
 public class PagoService {
 
     private final IPagoDAO pagoDAO;
-    private final IContratoDAO contratoDAO;
+    private final ContratoDAOO contratoDAO;
 
-    public PagoService(IPagoDAO pagoDAO, IContratoDAO contratoDAO) {
+    public PagoService(IPagoDAO pagoDAO, ContratoDAOO contratoDAO) {
         this.pagoDAO = pagoDAO;
         this.contratoDAO = contratoDAO;
     }

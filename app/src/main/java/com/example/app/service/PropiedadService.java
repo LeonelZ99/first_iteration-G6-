@@ -15,7 +15,7 @@ public class PropiedadService {
     this.propiedadDao = propiedadDao;
   }
   
-  public Propiedad getPropiedadById(Long idPropiedad) {
+  public Propiedad getPropiedad(Long idPropiedad) {
     Propiedad propiedad = this.propiedadDao.getPropiedadById(idPropiedad).orElse(null);
 
     if(propiedad == null) {

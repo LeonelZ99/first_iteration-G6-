@@ -49,15 +49,13 @@ public class PropietarioDAO {
       c.setApellido(sqlResponse.getString("apellido"));
       c.setDireccion(sqlResponse.getString("direccion"));
       c.setFechaNacimiento(((java.sql.Date) sqlResponse.getDate("fecha_nacimiento")).toLocalDate());
-      c.setIngresos(sqlResponse.getBigDecimal("ingresos"));
-      c.setEstadoCivil(sqlResponse.getString("estado_civil"));
       c.setTelefono(sqlResponse.getString("telefono"));
       c.setMail(sqlResponse.getString("mail"));
       c.setDni(sqlResponse.getString("dni"));
       c.setCuil(sqlResponse.getString("cuil"));
 
       Propietario p = new Propietario();
-      p.setCliente(c);
+      // p.setCliente(c);
       p.setCbu(sqlResponse.getString("cbu"));
 
       return Optional.of(p);

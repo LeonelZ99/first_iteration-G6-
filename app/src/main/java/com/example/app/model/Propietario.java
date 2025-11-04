@@ -8,5 +8,5 @@ import lombok.*;
 @NoArgsConstructor
 public class Propietario {
   private String cbu;
-  private Cliente cliente;
+  private Long idCliente;
 }

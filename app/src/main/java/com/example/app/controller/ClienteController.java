@@ -30,7 +30,7 @@ public class ClienteController {
         ApiResponse<Cliente> response = new ApiResponse<>(
             "success",
             "success message",
-            this.clienteService.getClienteById(id)
+            this.clienteService.getCliente(id)
         );
 
         return ResponseEntity.ok(response);
