@@ -4,14 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
 import org.sql2o.data.Row;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.example.app.model.Caja;
 
 @Component
 public class CajaDAO implements ICajaDAO {
 
+    private static final Logger logger = LoggerFactory.getLogger(CajaDAO.class);
+
     @Override
     public List<Caja> obtenerTodos() {
+        logger.debug("Ejecutando consulta para obtener todos los movimientos de caja");
         String sql = """
                     SELECT
                         id,
@@ -53,9 +58,10 @@ public class CajaDAO implements ICajaDAO {
                 c.setObservaciones(row.getString("observaciones"));
                 cajas.add(c);
             }
+            logger.info("Se obtuvieron {} movimientos de caja", cajas.size());
             return cajas;
         } catch (org.sql2o.Sql2oException e) {
-            // podés loguear el error si querés
+            logger.error("Error al obtener movimientos de caja", e);
             return new ArrayList<>();
         }
     }
