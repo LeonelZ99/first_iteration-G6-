@@ -1,16 +1,15 @@
 package com.example.app.model;
 
-import lombok.*;
-
 import java.math.BigDecimal;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 public class Inquilino {
-  private String estadoCivil; 
+  private Long clientesId;
+  private String estadoCivil;
   private BigDecimal ingresos;
   private Integer cantPersonasConvive;
   private String trabajo;
-  private Long idCliente;
 }

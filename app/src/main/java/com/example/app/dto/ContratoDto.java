@@ -5,14 +5,13 @@ import java.time.LocalDate;
 import java.util.List;
 
 public record ContratoDto(
-  LocalDate fechaInicio,
-  LocalDate fechaFin,
-  String clausulas,
-  String estado,
-  BigDecimal montoMensual,
-  BigDecimal depositoInicial,
-  Long idInquilino,
-  Long idPropiedad,
-  List<GaranteDto> garantes
-) {
+        LocalDate fechaInicio,
+        LocalDate fechaFin,
+        String clausulas,
+        String estado,
+        BigDecimal montoMensual,
+        BigDecimal depositoInicial,
+        Long idInquilino,
+        Long idPropiedad,
+        List<Long> idGarantes) {
 }

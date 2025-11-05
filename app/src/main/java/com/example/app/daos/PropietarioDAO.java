@@ -1,62 +1,63 @@
 package com.example.app.daos;
 
-import java.time.ZoneId;
 import java.util.Optional;
 
 import org.sql2o.data.Row;
+import org.springframework.stereotype.Component;
 
 import com.example.app.model.Cliente;
 import com.example.app.model.Propietario;
 
+@Component
 public class PropietarioDAO {
   public Optional<Propietario> getPropietarioById(Long idCliente) {
     String sql = """
-      SELECT
-        c.id,
-        c.nombre,
-        c.apellido,
-        c.direccion,
-        c.fecha_nacimiento,
-        c.ingresos,
-        c.estado_civil,
-        c.telefono,
-        c.mail,
-        c.dni,
-        c.cuil,
-        p.cbu
-      FROM clientes c
-      LEFT JOIN propietarios p ON p.id_propietario = c.id
-      WHERE c.id = :idCliente
-    """;
+          SELECT
+            c.id,
+            c.nombre,
+            c.apellido,
+            c.direccion,
+            c.fecha_nacimiento,
+            c.telefono,
+            c.mail,
+            c.dni,
+            c.cuil,
+            p.cbu,
+            p.clientes_id
+          FROM clientes c
+          JOIN propietarios p ON p.clientes_id = c.id
+          WHERE c.id = :idCliente
+        """;
 
-    try {
-      Optional<Row> row = Sql2oDAO.getSql2o()
-        .open()
-        .createQuery(sql)
-        .addParameter("idCliente", idCliente)
-        .executeAndFetchTable()
-        .rows()
-        .stream()
-        .findFirst();
+    try (var con = Sql2oDAO.getSql2o().open()) {
+      Optional<Row> rowOpt = con.createQuery(sql)
+          .addParameter("idCliente", idCliente)
+          .executeAndFetchTable()
+          .rows()
+          .stream()
+          .findFirst();
 
-      if (row.isEmpty()) return Optional.empty();
+      if (rowOpt.isEmpty())
+        return Optional.empty();
 
-      Row sqlResponse = row.get();
+      Row r = rowOpt.get();
 
       Cliente c = new Cliente();
-      c.setId(sqlResponse.getLong("id"));
-      c.setNombre(sqlResponse.getString("nombre"));
-      c.setApellido(sqlResponse.getString("apellido"));
-      c.setDireccion(sqlResponse.getString("direccion"));
-      c.setFechaNacimiento(((java.sql.Date) sqlResponse.getDate("fecha_nacimiento")).toLocalDate());
-      c.setTelefono(sqlResponse.getString("telefono"));
-      c.setMail(sqlResponse.getString("mail"));
-      c.setDni(sqlResponse.getString("dni"));
-      c.setCuil(sqlResponse.getString("cuil"));
+      c.setId(r.getLong("id"));
+      c.setNombre(r.getString("nombre"));
+      c.setApellido(r.getString("apellido"));
+      c.setDireccion(r.getString("direccion"));
+      c.setFechaNacimiento(((java.sql.Date) r.getDate("fecha_nacimiento")).toLocalDate());
+      c.setTelefono(r.getString("telefono"));
+      c.setMail(r.getString("mail"));
+      c.setDni(r.getString("dni"));
+      c.setCuil(r.getString("cuil"));
 
       Propietario p = new Propietario();
+      p.setClientesId(r.getLong("clientes_id"));
+      p.setCbu(r.getString("cbu"));
+      // si quisieras, podrías guardar el Cliente dentro de Propietario
       // p.setCliente(c);
-      p.setCbu(sqlResponse.getString("cbu"));
 
       return Optional.of(p);
 

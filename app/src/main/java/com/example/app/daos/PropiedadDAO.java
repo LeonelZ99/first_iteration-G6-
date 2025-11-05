@@ -18,26 +18,26 @@ public class PropiedadDAO implements IPropiedadDAO {
   @Override
   public Optional<Propiedad> getPropiedadById(Long idPropiedad) {
     String sql = """
-      SELECT
-        id,
-        direccion,
-        precio,
-        moneda,
-        tipo_propiedad,
-        id_propietario
-      FROM propiedades
-      WHERE id = :idPropiedad
-    """;
-    
+          SELECT
+            id,
+            direccion,
+            precio,
+            moneda,
+            tipo_propiedad,
+            id_propietario
+          FROM propiedades
+          WHERE id = :idPropiedad
+        """;
+
     try {
       Optional<Row> row = Sql2oDAO.getSql2o().createQuery(sql)
-        .addParameter("idPropiedad", idPropiedad)
-        .executeAndFetchTable()
-        .rows()
-        .stream()
-        .findFirst();
+          .addParameter("idPropiedad", idPropiedad)
+          .executeAndFetchTable()
+          .rows()
+          .stream()
+          .findFirst();
 
-      if(row.isEmpty()) {
+      if (row.isEmpty()) {
         return Optional.empty();
       } else {
         Row sqlResponse = row.get();

@@ -28,7 +28,7 @@ public class CajaDAO implements ICajaDAO {
                         categoria,
                         observaciones
                     FROM caja
-                    ORDER BY fecha ASC, id ASC
+                    ORDER BY fecha DESC, id DESC
                 """;
 
         try (var con = Sql2oDAO.getSql2o().open()) {

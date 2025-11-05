@@ -16,20 +16,25 @@ import org.slf4j.LoggerFactory;
 
 import com.example.app.dto.*;
 
-@Service 
+@Service
 public class ContratoService {
   private final ContratoDAOO contratoDao;
   private final GaranteDAO garanteDao;
   private final ClienteService clienteService;
   private final PropiedadService propiedadService;
+  private final InquilinoDAO inquilinoDao;
+  private final PropietarioDAO propietarioDao;
 
   private static final Logger logger = LoggerFactory.getLogger(ContratoService.class);
 
-  public ContratoService(ContratoDAOO contratoDao, ClienteService clienteService, PropiedadService propiedadService, GaranteDAO garanteDao) {
+  public ContratoService(ContratoDAOO contratoDao, ClienteService clienteService, PropiedadService propiedadService,
+      GaranteDAO garanteDao, InquilinoDAO inquilinoDao, PropietarioDAO propietarioDao) {
     this.contratoDao = contratoDao;
     this.clienteService = clienteService;
     this.propiedadService = propiedadService;
     this.garanteDao = garanteDao;
+    this.inquilinoDao = inquilinoDao;
+    this.propietarioDao = propietarioDao;
   }
 
   public GetContratoDto getContrato(Long idContrato) {
@@ -37,63 +42,128 @@ public class ContratoService {
 
     if (contrato == null) {
       throw new RuntimeException("El contrato no existe");
-    };
+    }
+    ;
 
     List<Long> garantes = this.clienteService.getGarantesByContrato(idContrato);
 
     return new GetContratoDto(
-      contrato.getId(),
-      contrato.getFechaInicio(),
-      contrato.getFechaFin(),
-      contrato.getClausulas(),
-      contrato.getEstado(),
-      contrato.getMontoMensual(),
-      contrato.getDepositoInicial(),
-      contrato.getIdInquilino(),
-      contrato.getIdPropiedad(),
-      garantes
-    );
+        contrato.getId(),
+        contrato.getFechaInicio(),
+        contrato.getFechaFin(),
+        contrato.getClausulas(),
+        contrato.getEstado(),
+        contrato.getMontoMensual(),
+        contrato.getDepositoInicial(),
+        contrato.getIdInquilino(),
+        contrato.getIdPropiedad(),
+        garantes);
   }
 
-  public Contrato saveContrato(ContratoDto contrato) {
-    Cliente inquilino = this.clienteService.getCliente(contrato.idInquilino());
-    Propiedad propiedad = this.propiedadService.getPropiedad(contrato.idPropiedad());
-    // Cliente propietario = this.clienteService.getCliente(propiedad.getId());
-    
-    ArrayList<Garante> garantes = new ArrayList<>();
+  public ContratoResponseDto saveContrato(ContratoDto dto) {
 
-    for (GaranteDto garante : contrato.garantes()) {
-      Garante garanteToAdd = this.clienteService.getGarante(garante.idGarante());
-      
-      garantes.add(garanteToAdd);
+    // 1) Entidades básicas
+    Cliente inquilinoCliente = clienteService.getCliente(dto.idInquilino());
+    Propiedad propiedad = propiedadService.getPropiedad(dto.idPropiedad());
+
+    // inquilino socioeconómico
+    var inquilinoOpt = inquilinoDao.getByClienteId(dto.idInquilino());
+    if (inquilinoOpt.isEmpty()) {
+      throw new RuntimeException("El inquilino no existe como inquilino (tabla inquilinos)");
     }
+    Inquilino inquilino = inquilinoOpt.get();
 
-    if(propiedad.getIdPropietario().equals(inquilino.getId())) {
+    // propietario de la propiedad
+    var propietarioOpt = propietarioDao.getPropietarioById(propiedad.getIdPropietario());
+    if (propietarioOpt.isEmpty()) {
+      throw new RuntimeException("Propietario no encontrado");
+    }
+    Propietario propietario = propietarioOpt.get();
+
+    // garantes
+    List<Garante> garantes = dto.idGarantes().stream()
+        .map(id -> garanteDao.getGaranteById(id)
+            .orElseThrow(() -> new RuntimeException("Garante no encontrado: " + id)))
+        .toList();
+
+    // 2) Regla de negocio
+    if (propiedad.getIdPropietario().equals(inquilinoCliente.getId())) {
       throw new RuntimeException("El inquilino es propietario de la propiedad seleccionada");
     }
 
-    Contrato newContrato = new Contrato();
-    newContrato.setFechaInicio(contrato.fechaInicio());
-    newContrato.setFechaFin(contrato.fechaFin());
-    newContrato.setClausulas(contrato.clausulas());
-    newContrato.setEstado(contrato.estado());
-    newContrato.setMontoMensual(contrato.montoMensual());
-    newContrato.setDepositoInicial(contrato.depositoInicial());
-    newContrato.setIdInquilino(contrato.idInquilino());
-    newContrato.setIdPropiedad(contrato.idPropiedad());
+    // 3) Crear contrato en BD
+    Contrato contrato = new Contrato();
+    contrato.setFechaInicio(dto.fechaInicio());
+    contrato.setFechaFin(dto.fechaFin());
+    contrato.setClausulas(dto.clausulas());
+    contrato.setEstado(dto.estado());
+    contrato.setMontoMensual(dto.montoMensual());
+    contrato.setDepositoInicial(dto.depositoInicial());
+    contrato.setIdInquilino(dto.idInquilino());
+    contrato.setIdPropiedad(dto.idPropiedad());
 
-    try {
-      Contrato contratoCreated = this.contratoDao.insert(newContrato);
-      
-      for(Garante g: garantes) {
-        System.out.println(g);
-        g.setIdContrato(contratoCreated.getId());
-        clienteService.updateGarante(g);
-      }
- 
-      return newContrato; 
-    } catch (RuntimeException e) {
-      throw new RuntimeException(e.getMessage());
+    Contrato contratoCreated = contratoDao.insert(contrato);
+
+    for (Garante g : garantes) {
+      g.setIdContrato(contratoCreated.getId());
+      clienteService.updateGarante(g);
     }
+
+    // 4) Mapear ENTIDADES -> DTOs con datos completos
+
+    // InquilinoDto
+    InquilinoDto inquilinoDto = new InquilinoDto(
+        inquilino.getEstadoCivil(),
+        inquilino.getIngresos(),
+        inquilino.getCantPersonasConvive(),
+        inquilino.getTrabajo(),
+        inquilino.getClientesId());
+
+    Cliente propietarioCliente = clienteService.getCliente(propietario.getClientesId());
+    ClienteDto propietarioClienteDto = new ClienteDto(
+        propietarioCliente.getId(),
+        propietarioCliente.getNombre(),
+        propietarioCliente.getApellido(),
+        propietarioCliente.getDireccion(),
+        propietarioCliente.getFechaNacimiento(),
+        propietarioCliente.getTelefono(),
+        propietarioCliente.getMail(),
+        propietarioCliente.getCuil(),
+        propietarioCliente.getDni());
+
+    PropietarioDto propietarioDto = new PropietarioDto(
+        propietario.getCbu(),
+        propietarioClienteDto);
+
+    PropiedadDto propiedadDto = new PropiedadDto(
+        propiedad.getId(),
+        propiedad.getDireccion(),
+        propiedad.getPrecio(),
+        propiedad.getMoneda(),
+        propiedad.getTipoPropiedad(),
+        propietarioDto);
+
+    // GarantesDto
+    List<GaranteDto> garantesDto = garantes.stream()
+        .map(g -> new GaranteDto(
+            g.getIdCliente(), // idGarante = cliente garante
+            g.getIngresos(),
+            g.getTrabajo(),
+            g.getIdContrato()))
+        .toList();
+
+    // 5) DTO de respuesta
+    return new ContratoResponseDto(
+        contratoCreated.getId(),
+        contratoCreated.getFechaInicio(),
+        contratoCreated.getFechaFin(),
+        contratoCreated.getClausulas(),
+        contratoCreated.getEstado(),
+        contratoCreated.getMontoMensual(),
+        contratoCreated.getDepositoInicial(),
+        inquilinoDto,
+        propiedadDto,
+        garantesDto);
   }
+
 }
