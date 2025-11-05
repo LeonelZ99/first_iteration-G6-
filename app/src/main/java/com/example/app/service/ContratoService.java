@@ -37,17 +37,76 @@ public class ContratoService {
     this.propietarioDao = propietarioDao;
   }
 
-  public GetContratoDto getContrato(Long idContrato) {
-    Contrato contrato = this.contratoDao.getContratoById(idContrato).orElse(null);
+  public ContratoResponseDto getContrato(Long idContrato) {
+    // 1) Traer contrato
+    Contrato contrato = this.contratoDao.getContratoById(idContrato)
+        .orElseThrow(() -> new RuntimeException("El contrato no existe"));
 
-    if (contrato == null) {
-      throw new RuntimeException("El contrato no existe");
+    // 2) Inquilino socioeconómico
+    var inquilinoOpt = inquilinoDao.getByClienteId(contrato.getIdInquilino());
+    if (inquilinoOpt.isEmpty()) {
+      throw new RuntimeException("El inquilino no existe como inquilino (tabla inquilinos)");
     }
-    ;
+    Inquilino inquilino = inquilinoOpt.get();
 
-    List<Long> garantes = this.clienteService.getGarantesByContrato(idContrato);
+    InquilinoDto inquilinoDto = new InquilinoDto(
+        inquilino.getEstadoCivil(),
+        inquilino.getIngresos(),
+        inquilino.getCantPersonasConvive(),
+        inquilino.getTrabajo(),
+        inquilino.getClientesId());
 
-    return new GetContratoDto(
+    // 3) Propiedad + propietario
+    Propiedad propiedad = propiedadService.getPropiedad(contrato.getIdPropiedad());
+
+    var propietarioOpt = propietarioDao.getPropietarioById(propiedad.getIdPropietario());
+    if (propietarioOpt.isEmpty()) {
+      throw new RuntimeException("Propietario no encontrado");
+    }
+    Propietario propietario = propietarioOpt.get();
+
+    Cliente propietarioCliente = clienteService.getCliente(propietario.getClientesId());
+    ClienteDto propietarioClienteDto = new ClienteDto(
+        propietarioCliente.getId(),
+        propietarioCliente.getNombre(),
+        propietarioCliente.getApellido(),
+        propietarioCliente.getDireccion(),
+        propietarioCliente.getFechaNacimiento(),
+        propietarioCliente.getTelefono(),
+        propietarioCliente.getMail(),
+        propietarioCliente.getCuil(),
+        propietarioCliente.getDni());
+
+    PropietarioDto propietarioDto = new PropietarioDto(
+        propietario.getCbu(),
+        propietarioClienteDto);
+
+    PropiedadDto propiedadDto = new PropiedadDto(
+        propiedad.getId(),
+        propiedad.getDireccion(),
+        propiedad.getPrecio(),
+        propiedad.getMoneda(),
+        propiedad.getTipoPropiedad(),
+        propietarioDto);
+
+    // 4) Garantes: primero ids, después datos completos
+    List<Long> idsGarantes = clienteService.getGarantesByContrato(contrato.getId());
+
+    List<Garante> garantes = idsGarantes.stream()
+        .map(id -> garanteDao.getGaranteById(id)
+            .orElseThrow(() -> new RuntimeException("Garante no encontrado: " + id)))
+        .toList();
+
+    List<GaranteDto> garantesDto = garantes.stream()
+        .map(g -> new GaranteDto(
+            g.getIdCliente(), // id del cliente garante
+            g.getIngresos(),
+            g.getTrabajo(),
+            g.getIdContrato()))
+        .toList();
+
+    // 5) Armar DTO de respuesta
+    return new ContratoResponseDto(
         contrato.getId(),
         contrato.getFechaInicio(),
         contrato.getFechaFin(),
@@ -55,9 +114,9 @@ public class ContratoService {
         contrato.getEstado(),
         contrato.getMontoMensual(),
         contrato.getDepositoInicial(),
-        contrato.getIdInquilino(),
-        contrato.getIdPropiedad(),
-        garantes);
+        inquilinoDto,
+        propiedadDto,
+        garantesDto);
   }
 
   public ContratoResponseDto saveContrato(ContratoDto dto) {

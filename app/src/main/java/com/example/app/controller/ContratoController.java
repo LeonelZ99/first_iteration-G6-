@@ -42,10 +42,10 @@ public class ContratoController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<ApiResponse<GetContratoDto>> createContrato(
+  public ResponseEntity<ApiResponse<ContratoResponseDto>> createContrato(
       @PathVariable("id") Long id) {
 
-    ApiResponse<GetContratoDto> response = new ApiResponse<>(
+    ApiResponse<ContratoResponseDto> response = new ApiResponse<>(
         "ok",
         "contrato creado exitosamente",
         this.contratoService.getContrato(id));
