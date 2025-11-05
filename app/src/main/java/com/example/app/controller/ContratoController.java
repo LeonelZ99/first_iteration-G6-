@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
 import com.example.app.format.ApiResponse;
-import com.example.app.model.Contrato;
 import com.example.app.service.ContratoService;
 
 import com.example.app.dto.*;

@@ -7,8 +7,6 @@ import com.example.app.daos.*;
 import org.springframework.stereotype.Service;
 
 import java.lang.RuntimeException;
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.*;
 
 import org.slf4j.Logger;
@@ -38,11 +36,9 @@ public class ContratoService {
   }
 
   public ContratoResponseDto getContrato(Long idContrato) {
-    // 1) Traer contrato
     Contrato contrato = this.contratoDao.getContratoById(idContrato)
         .orElseThrow(() -> new RuntimeException("El contrato no existe"));
 
-    // 2) Inquilino socioeconómico
     var inquilinoOpt = inquilinoDao.getByClienteId(contrato.getIdInquilino());
     if (inquilinoOpt.isEmpty()) {
       throw new RuntimeException("El inquilino no existe como inquilino (tabla inquilinos)");
@@ -56,7 +52,6 @@ public class ContratoService {
         inquilino.getTrabajo(),
         inquilino.getClientesId());
 
-    // 3) Propiedad + propietario
     Propiedad propiedad = propiedadService.getPropiedad(contrato.getIdPropiedad());
 
     var propietarioOpt = propietarioDao.getPropietarioById(propiedad.getIdPropietario());
@@ -89,7 +84,6 @@ public class ContratoService {
         propiedad.getTipoPropiedad(),
         propietarioDto);
 
-    // 4) Garantes: primero ids, después datos completos
     List<Long> idsGarantes = clienteService.getGarantesByContrato(contrato.getId());
 
     List<Garante> garantes = idsGarantes.stream()
@@ -99,13 +93,13 @@ public class ContratoService {
 
     List<GaranteDto> garantesDto = garantes.stream()
         .map(g -> new GaranteDto(
-            g.getIdCliente(), // id del cliente garante
+            g.getIdCliente(),
             g.getIngresos(),
             g.getTrabajo(),
             g.getIdContrato()))
         .toList();
 
-    // 5) Armar DTO de respuesta
+    // 5) Armamos DTO de respuesta
     return new ContratoResponseDto(
         contrato.getId(),
         contrato.getFechaInicio(),
