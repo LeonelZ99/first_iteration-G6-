@@ -10,10 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-import com.example.app.service.ContratoService;
-
-import com.example.app.dto.*;
-
 @RestController
 @RequestMapping("/api/caja")
 public class CajaController {
