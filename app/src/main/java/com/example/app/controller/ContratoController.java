@@ -33,7 +33,7 @@ public class ContratoController {
   public ResponseEntity<ApiResponse<ContratoResponseDto>> createContrato(
       @RequestBody ContratoDto contratoDto) {
     ApiResponse<ContratoResponseDto> response = new ApiResponse<>(
-        "ok",
+        "201",
         "contrato creado exitosamente",
         this.contratoService.saveContrato(contratoDto));
 
@@ -45,8 +45,8 @@ public class ContratoController {
       @PathVariable("id") Long id) {
 
     ApiResponse<ContratoResponseDto> response = new ApiResponse<>(
-        "ok",
-        "contrato creado exitosamente",
+        "200",
+        "contrato obtenido exitosamente",
         this.contratoService.getContrato(id));
 
     return ResponseEntity.ok(response);
