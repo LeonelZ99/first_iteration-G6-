@@ -1,11 +1,9 @@
 package com.example.app.service;
 
 import com.example.app.model.*;
-import com.example.app.daos.ClienteDAO;
 import com.example.app.daos.PropiedadDAO;
 
 import org.springframework.stereotype.Service;
-
 
 @Service
 public class PropiedadService {
@@ -14,11 +12,11 @@ public class PropiedadService {
   public PropiedadService(PropiedadDAO propiedadDao) {
     this.propiedadDao = propiedadDao;
   }
-  
+
   public Propiedad getPropiedad(Long idPropiedad) {
     Propiedad propiedad = this.propiedadDao.getPropiedadById(idPropiedad).orElse(null);
 
-    if(propiedad == null) {
+    if (propiedad == null) {
       throw new RuntimeException("La propiedad no existe");
     }
 

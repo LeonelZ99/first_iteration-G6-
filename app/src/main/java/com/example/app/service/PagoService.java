@@ -11,7 +11,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 
-import java.time.LocalDateTime;
 @Service
 public class PagoService {
 
@@ -28,7 +27,6 @@ public class PagoService {
             throw new RuntimeException("Datos de pago inválidos");
         }
 
-        // 1) Obtener contrato
         Contrato contrato = contratoDAO.getContratoById(req.contratoId())
                 .orElseThrow(() -> new RuntimeException("Contrato no encontrado"));
 
@@ -36,19 +34,15 @@ public class PagoService {
             throw new RuntimeException("El contrato no está vigente");
         }
 
-        // 2) Validar periodo dentro de la vigencia del contrato
         LocalDate periodo = req.periodo();
 
-        // 4) Calcular monto
         BigDecimal expensas = req.expensas() != null ? req.expensas() : BigDecimal.ZERO;
         BigDecimal impuestos = req.impuestos() != null ? req.impuestos() : BigDecimal.ZERO;
         BigDecimal precio = contrato.getMontoMensual() != null ? contrato.getMontoMensual() : BigDecimal.ZERO;
         BigDecimal monto = precio.add(expensas).add(impuestos);
 
-        // 5) Fecha pago
         LocalDate fechaPago = req.fechaPago() != null ? req.fechaPago() : LocalDate.now();
 
-        // 6) Insert
         Long reciboId = pagoDAO.insertPago(
                 req.contratoId(),
                 periodo.toString(),
